@@ -1,5 +1,5 @@
 # PDF-Document-Summarizer
-This is my Raw Documentation of my thought process while figuring out how to build a PDF document summarizer. It's not a tutorial or a coherent explanation of how I created the PDF document summarizer.
+This is the Raw Documentation of my thought process while figuring out how to build a PDF document summarizer. It's not a tutorial or a coherent explanation of how I created the PDF document summarizer.
 
 ## Raw Documentation 
 - My pain point to resolve is to summarize long academic pdfs
