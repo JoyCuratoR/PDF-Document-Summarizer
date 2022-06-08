@@ -18,9 +18,7 @@ extract <- ocr(pdf)
 cat(extract)
 
 # exporting as .txt file to add html nodes in an HTML editor
-write.table(extract, file = "extracted_text.txt", sep = "") # can i export as an
-#html file instead of a txt? And can I put html tags in r script instead of 
-#manually doing it? 
+write.table(extract, file = "extracted_text.txt", sep = "") 
 
 # summarizing the imported tagged html file 
 url <- "D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/extracted_text.html"
@@ -30,10 +28,9 @@ page %>%
   html_nodes("p") %>%
   html_text() %>%
   .[. != ""] -> text
-head(text) # showed a number of \r\ and \n\, don't know what this is or how to 
-#get rid of them
+head(text) # returned with a number of \r\ and \n\
 
-# how to replace multiple strings using nested gsub statement
+# how to get rid of \r\ and \n\ using nested gsub statement for multiple strings
 cleaned <- gsub('\r\n', "",
 gsub('\u0092', "'",
 gsub('\u0093', "",
@@ -52,5 +49,3 @@ top3sen %>%
   mutate(sentenceId = as.numeric(str_remove_all(sentenceId, ".*_"))) %>%
   arrange(sentenceId) %>%
   pull(sentence)
-
-# next stage is to see if you can make it into an Rshiny application
