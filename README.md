@@ -34,30 +34,30 @@ eng <- tesseract("eng")
 ```
 To download different languages use the function ```  tesseract_download() ``` and go to the [TesseractOCR GitHub](https://github.com/tesseract-ocr/tessdata) to find out what three letters represents each language.
 
-Then we're going to load and render our PDF using the function ``` pdf_convert ``` from the ```pdftools``` package. This will convert all the pages of the PDF into .png files. After it's done converting the PDF into .png files, we're going to extract the text. 
+Then we're going to load and render our PDF using the function ``` pdf_convert ``` from the ```pdftools``` package and indicate the path of the PDF. This will convert all the pages of the PDF into PNG files. After it's done converting into PNG files, we're going to extract the text from them. 
 
 ``` r
-pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/doc_1.pdf",
+pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer/doc_1.pdf",
                              dpi = 600)
 
 extract <- ocr(pdf)
 
 cat(extract) # view the text from all the .png files together
 ```
-# Step 3: Exporting as .html file
+# Step 3: Exporting as HTML file
 ``` r
 write.table(extract, file = "extracted_text.html", sep = "")
 ```
-We're going to open ``` extracted_text.html ``` in RStudio to clean it up a bit. This part is a bit tedious depending on how long the PDF is because the PDF has been split into (in my case 8) different .png files, and when we open up our ``` extracted_text.html ``` file, there's going to be extra text that looks like this <strong> "x""1"" </strong> and <strong> 1""2"</strong> that marks the beginning and end of each .png file. 
+We're going to open ``` extracted_text.html ``` file in RStudio to clean it up a bit. This part is a bit tedious depending on how long the PDF is because the PDF has been split into (in my case 8) different PNG files, and when we open up our ``` extracted_text.html ``` file, there's going to be extra strings that looks like this <em> "x""1"" </em> and <em> 1""2"</em> that marks the beginning and end of each PNG file. 
 
-These extra text are what we'll have to manually go through our file to delete. After we've cleaned up our text, the next thing to do is to add some ``` <p> </p> ``` HTML tags to the start and end of the body text we want to summarize. In my case, I placed mine starting from ``` <p> A considerable amount of research in recent decades has been dedicated to stress and burn out ``` and ending at ``` There is enough conceptual
+These extra strings are what we'll have to manually go through our file to delete. After we've cleaned up our text, the next thing to do is to add some ``` <p> </p> ``` HTML tags to the start and end of the body text we want to summarize. In my case, I placed mine starting from ``` <p> A considerable amount of research in recent decades has been dedicated to stress and burn out ``` and ending at ``` There is enough conceptual
 support to encourage such research. </p> ``` forgoing both the title of the paper and the end page references. 
 
 # Step 5: Loading & Reading the cleaned HTML file
 We're going to create a new variable with our cleaned ``` extracted_text.html ``` file and use the function ``` read_html ``` to read the HTML tags we added.
 
 ``` r
-url <- "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer//extracted_text.html"
+url <- "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer/extracted_text.html"
 page <- read_html(url)
 ```
 Then we'll specify which HTML tags to recognize. 
