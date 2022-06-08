@@ -1,38 +1,105 @@
-# PDF-Document-Summarizer
-This is the Raw Documentation of my thought process while figuring out how to build a PDF document summarizer. It's not a tutorial or a coherent explanation of how I created the PDF document summarizer.
+# How to summarize an academic paper in a PDF document with R
+This project was built in part using [LADA's text summarization tutorial](https://slcladal.github.io/txtsum.html).
 
-## Raw Documentation 
-- My pain point to resolve is to summarize long academic pdfs
-- Found a [guide](https://slcladal.github.io/txtsum.html) that summarizes online articles through searching on Google for 'build text summarizers in r'
-- After searching for a guide that summarizes text in pdfs but to no avail, I thought to convert pdf to html
-- Discovered a function "pdf2html" in the BrailleR package however after some testing, I couldn't make it work
-- Then I looked for online conversion tools, found one that converts pdfs to html files but the finished result gave me a blank html file
-- So I converted the pdf to a txt file and then to an html file so that I could load it into my R environment
-- Though copying the html file name registered the R environment not being able to detect the file because of the extra 'file:///' After deleting that small bit, I was able to create a variable
-- Performing this code:
+Somtimes with academic research papers, you don't know which ones are relevant to your topic. To save time, I wrote a script in R that can summarize the most important points of an academic paper in a PDF document.
 
-      page %>%
-  
-        html_nodes("p") %>%
-    
-        html_text() %>%
-    
-        .[. != ""] -> text
-        
-     
-      head(text)
+# Step 1: Import the libraries
+``` r
+library(xml2)
+library(rvest)
+library(lexRankr)
+library(textmineR)
+library(tidyverse)
+library(quanteda)
+library(igraph)
+library(here)
+library(tesseract)
+library(readtext)
+```
+Run all the libraries after importing them. 
+
+# Step 2: Loading in the PDF and extracting the text 
+To extract the text from the PDF, we're going to use the TessseractOCR package. Before we begin, make sure the working directory is set. 
+``` r
+getwd()
+> "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer"
+
+setwd("D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer")
+> setwd("D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer")
+```
+
+Next we're going to create a variable that identifies the language the PDF document is in. To download different languages use the function ```  tesseract_download() ``` And go to the [TesseractOCR GitHub](https://github.com/tesseract-ocr/tessdata) to find out what three letters represents each language.
+``` r
+eng <- tesseract("eng")
+```
+Then load and render your PDF into the environment using the function ``` pdf_convert ``` from the pdftools package. This will convert all the pages of the PDF into .png files. After it's done converting the PDF, we're going to extract the text. 
+
+``` r
+pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/doc_1.pdf",
+                             dpi = 600)
+
+extract <- ocr(pdf)
+
+cat(extract) # view the text from all the .png files
+```
+# Step 3: Exporting as .html file
+``` r
+write.table(extract, file = "extracted_text.html", sep = "")
+```
+We're going to open ``` extracted_text.html ``` in RStudio to clean it up a bit. This part is a bit tedious depending on how long the PDF is because the PDF has been split into (in my case 8) different .png files, and when we open up our ``` extracted_text.html ``` file, there's going to be extra text that looks like this <strong> "x""1"" </strong> and <strong> 1""2"</strong> that marks the beginning and end of each .png file. 
+
+These extra text are what we'll have to manually go through our file to delete. After we've cleaned up our text, the next thing to do is to add some ``` <p> </p> ``` HTML tags to the start and end of the body text we want to summarize. In my case, I placed mine starting from ``` <p> A considerable amount of research in recent decades has been dedicated to stress and burn out ``` and ending at ``` There is enough conceptual
+support to encourage such research. </p> ``` forgoing both the title of the paper and the end page references. 
+
+# Step 5: Loading & Reading the cleaned HTML file
+We're going to create a new variable with our cleaned ``` extracted_text.html ``` file and use the function ``` read_html ``` to read the HTML tags we added to our extracted text.
+
+``` r
+url <- "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer//extracted_text.html"
+page <- read_html(url)
+```
+Then we'll specify which HTML tags to recognize. 
+``` r
+page %>%
+  html_nodes("p") %>%
+  html_text() %>%
+  .[. != ""] -> text
+
+head(text) 
+```
+When we view our text, we'll find ``` \r\n ``` 
+Now we can get rid of them by using the function ``` gsub() ``` however, I found that it will just return more text we need to replace such as ``` \u0092 ``` ``` \u0093 ``` ```\u0094```
+So to replace them all at once, we'll use a nested ``` gsub()``` function instead. 
+
+``` r
+cleaned <- gsub('\r\n', "",
+gsub('\u0092', "'",
+gsub('\u0093', "",
+gsub('\u0094', "", text))))
+
+head(cleaned)
+```
+Now we should be free of any more text to clean.
+
+# Step 6: Ranking and Summarizing
+``` r
+# ranking for top seven sentences
+top3sen <- lexRank(cleaned, docId = rep(1, length(text)), n = 7, continuous = T) 
+
+# extract and display sentences
+top3sen$sentence 
+
+# ordering sentences chronologically
+top3sen %>%
+  mutate(sentenceId = as.numeric(str_remove_all(sentenceId, ".*_"))) %>%
+  arrange(sentenceId) %>%
+  pull(sentence)
+``` 
 
 
-Returned: character(0)
 
 
-- Which means there are no objects in my R environment and the conversion to pdf -> txt -> html did not work
-- Hours later I thought to put the pdf file into a corpus since that's how I was able to extract the text for a word frequency analysis in a previous project
-- I was able to perform a centrality analysis after conversion to a corpus however it returned the same exact lines and I don't know where to go from there
-- Found a [5 part tutorial](https://cran.r-project.org/web/packages/textmineR/index.html) for document summarizer, I don't know if it is referring to URLs or other types of files like pdfs too.
-- Because of an Upwork job posting about transforming a screenshot photo into text to then be put in a spreadsheet, I looked up how to do that and came across OCR packages in R
-- I learned Tesseract OCR in R which taught me how to extract text data from PDFs
-- After learning that package, it gave me an idea to use Tesseract OCR to extract text data from a PDF, edit some HTML tags into the sections of text that I want to summarize, and then essentially apply the article summarizer script
-- When adding HTML tags to the extacted text in the .txt file, I had to do some manual cleaning of headers and footer text
-- Once I only had the main body text I wanted to summarize did I add the paragraph HTML tag to the beginning and end of the text
-- Following my idea through, it returned a successful summary of my academic PDF article
+
+
+
+
