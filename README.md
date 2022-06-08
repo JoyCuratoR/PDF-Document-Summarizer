@@ -1,9 +1,9 @@
 # How to summarize an academic paper in a PDF document with R
 This project was built in part using [LADA's text summarization tutorial](https://slcladal.github.io/txtsum.html).
 
-Somtimes with academic research papers, you don't know which ones are relevant to your topic. To save time, I wrote a script in R that can summarize the most important points of an academic paper in a PDF document.
+Somtimes with academic research papers, you don't know which ones are relevant to your topic. To save time, let's write a script in R that can summarize & rank the most important sentences of an academic paper in a PDF document.
 
-# Step 1: Import the libraries
+# Step 1: Importing the libraries
 ``` r
 library(xml2)
 library(rvest)
@@ -19,7 +19,7 @@ library(readtext)
 Run all the libraries after importing them. 
 
 # Step 2: Loading in the PDF and extracting the text 
-To extract the text from the PDF, we're going to use the TessseractOCR package. Before we begin, make sure the working directory is set. 
+To extract the text from the PDF, we're going to use the ```TessseractOCR``` package. Before we begin, make sure the working directory is set. 
 ``` r
 getwd()
 > "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer"
@@ -28,11 +28,13 @@ setwd("D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer")
 > setwd("D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer")
 ```
 
-Next we're going to create a variable that identifies the language the PDF document is in. To download different languages use the function ```  tesseract_download() ``` And go to the [TesseractOCR GitHub](https://github.com/tesseract-ocr/tessdata) to find out what three letters represents each language.
+Next, we're going to create a variable that identifies the language the PDF document is in. 
 ``` r
 eng <- tesseract("eng")
 ```
-Then load and render your PDF into the environment using the function ``` pdf_convert ``` from the pdftools package. This will convert all the pages of the PDF into .png files. After it's done converting the PDF, we're going to extract the text. 
+To download different languages use the function ```  tesseract_download() ``` and go to the [TesseractOCR GitHub](https://github.com/tesseract-ocr/tessdata) to find out what three letters represents each language.
+
+Then we're going to load and render our PDF using the function ``` pdf_convert ``` from the ```pdftools``` package. This will convert all the pages of the PDF into .png files. After it's done converting the PDF into .png files, we're going to extract the text. 
 
 ``` r
 pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/doc_1.pdf",
@@ -40,7 +42,7 @@ pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/do
 
 extract <- ocr(pdf)
 
-cat(extract) # view the text from all the .png files
+cat(extract) # view the text from all the .png files together
 ```
 # Step 3: Exporting as .html file
 ``` r
@@ -52,7 +54,7 @@ These extra text are what we'll have to manually go through our file to delete. 
 support to encourage such research. </p> ``` forgoing both the title of the paper and the end page references. 
 
 # Step 5: Loading & Reading the cleaned HTML file
-We're going to create a new variable with our cleaned ``` extracted_text.html ``` file and use the function ``` read_html ``` to read the HTML tags we added to our extracted text.
+We're going to create a new variable with our cleaned ``` extracted_text.html ``` file and use the function ``` read_html ``` to read the HTML tags we added.
 
 ``` r
 url <- "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer//extracted_text.html"
@@ -67,13 +69,15 @@ page %>%
 
 head(text) 
 ```
-When we view our text, we'll find ``` \r\n ``` 
-Now we can get rid of them by using the function ``` gsub() ``` however, I found that it will just return more text we need to replace such as ``` \u0092 ``` ``` \u0093 ``` ```\u0094```
+When we view our text, we'll find som ``` \r\n ``` scattered about.
+
+We can get rid of them by using the function ``` gsub() ``` however, I found that it will just return more text we need to replace such as ``` \u0092 ```(indicates apostrophe punctuation mark), ``` \u0093 ```, ```\u0094```
+
 So to replace them all at once, we'll use a nested ``` gsub()``` function instead. 
 
 ``` r
 cleaned <- gsub('\r\n', "",
-gsub('\u0092', "'",
+gsub('\u0092', "'", # instead of replacing with a blank space, replace with an apostrophe
 gsub('\u0093', "",
 gsub('\u0094', "", text))))
 
@@ -95,7 +99,7 @@ top3sen %>%
   arrange(sentenceId) %>%
   pull(sentence)
 ``` 
-
+Voila! We should now have the top seven most significant sentences out of the entire paper.
 
 
 
