@@ -11,13 +11,15 @@ This is my Raw Documentation of my thought process while figuring out how to bui
 - Though copying the html file name registered the R environment not being able to detect the file because of the extra 'file:///' After deleting that small bit, I was able to create a variable
 - Performing this code:
 
-page %>%
-html_nodes("p") %>%
-html_text() %>%
-.[. != ""] -> text
+  page %>%
+    html_nodes("p") %>%
+    html_text() %>%
+    .[. != ""] -> text
+    
 head(text)
 
 Returned: character(0)
+
 
 - Which means there are no objects in my R environment and the conversion to pdf -> txt -> html did not work
 - Hours later I thought to put the pdf file into a corpus since that's how I was able to extract the text for a word frequency analysis in a previous project
