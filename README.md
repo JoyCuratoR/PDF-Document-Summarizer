@@ -1,5 +1,5 @@
 # PDF-Document-Summarizer
-This is my Raw Documentation of my thought process while figuring out how to build a PDF document summarizer 
+This is my Raw Documentation of my thought process while figuring out how to build a PDF document summarizer. It's not a tutorial or a coherent explanation of how I created the PDF document summarizer.
 
 ## Raw Documentation 
 - My pain point to resolve is to summarize long academic pdfs
@@ -11,15 +11,17 @@ This is my Raw Documentation of my thought process while figuring out how to bui
 - Though copying the html file name registered the R environment not being able to detect the file because of the extra 'file:///' After deleting that small bit, I was able to create a variable
 - Performing this code:
 
-  page %>%
+      page %>%
   
-    html_nodes("p") %>%
+        html_nodes("p") %>%
     
-    html_text() %>%
+        html_text() %>%
     
-    .[. != ""] -> text
-    
-head(text)
+        .[. != ""] -> text
+        
+     
+      head(text)
+
 
 Returned: character(0)
 
