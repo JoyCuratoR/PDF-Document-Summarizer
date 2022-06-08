@@ -12,8 +12,11 @@ This is my Raw Documentation of my thought process while figuring out how to bui
 - Performing this code:
 
   page %>%
+  
     html_nodes("p") %>%
+    
     html_text() %>%
+    
     .[. != ""] -> text
     
 head(text)
