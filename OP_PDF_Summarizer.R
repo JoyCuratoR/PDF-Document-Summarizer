@@ -9,28 +9,31 @@ library(here)
 library(tesseract)
 library(readtext)
 
-# I combined lessons from Tesseract OCR, HTML, and Basic Url Summarizer
 
 eng <- tesseract("eng")
-pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/doc_1.pdf",
+
+pdf <- pdftools::pdf_convert("D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer/doc_1.pdf",
                              dpi = 600)
+
 extract <- ocr(pdf)
+
 cat(extract)
 
-# exporting as .txt file to add html nodes in an HTML editor
-write.table(extract, file = "extracted_text.txt", sep = "") 
 
-# summarizing the imported tagged html file 
-url <- "D:/R_Studio/Project_Vault/GP_AutoTextSummarizer/extracted_text.html"
+# exporting as .html file to add html nodes in an HTML editor
+write.table(extract, file = "extracted_text.html", sep = "") 
+
+# summarizing the tagged html file 
+url <- "D:/R_Studio/Project_Vault/GP.OP_AutoTextSummarizer/OP_PDF_Summarizer//extracted_text.html"
 page <- read_html(url)
 
 page %>%
   html_nodes("p") %>%
   html_text() %>%
   .[. != ""] -> text
-head(text) # returned with a number of \r\ and \n\
+head(text) # showed a number of \r\ and \n\
 
-# how to get rid of \r\ and \n\ using nested gsub statement for multiple strings
+# how to replace multiple strings using nested gsub statement
 cleaned <- gsub('\r\n', "",
 gsub('\u0092', "'",
 gsub('\u0093', "",
