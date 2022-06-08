@@ -33,4 +33,6 @@ Returned: character(0)
 - Because of an Upwork job posting about transforming a screenshot photo into text to then be put in a spreadsheet, I looked up how to do that and came across OCR packages in R
 - I learned Tesseract OCR in R which taught me how to extract text data from PDFs
 - After learning that package, it gave me an idea to use Tesseract OCR to extract text data from a PDF, edit some HTML tags into the sections of text that I want to summarize, and then essentially apply the article summarizer script
-- That returned a successful summary of my academic PDF article
+- When adding HTML tags to the extacted text in the .txt file, I had to do some manual cleaning of headers and footer text
+- Once I only had the text I wanted to summarize did I add the HTML tag <p> and </p> to the beginning and end of the text
+- Following my idea through, it returned a successful summary of my academic PDF article
